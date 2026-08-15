@@ -102,18 +102,19 @@ class AdminService
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-    public function updateDoctor($id){
-try{
-    $locale = request()->input('lang');
-        App::setLocale($locale);
-    $doctor=Doctor::find($id);
-    $department=Department::where('name',request('department'))->first();
-    if(!$doctor)
-        return response()->json("Doctor not found",404);
-    if(!$department)
-        return response()->json("Department not found",404);
+    public function updateDoctor($id)
+    {
+        try {
+            $locale = request()->input('lang');
+            App::setLocale($locale);
+            $doctor = Doctor::find($id);
+            $department = Department::where('name', request('department'))->first();
+            if (!$doctor)
+                return response()->json(['message' => __('messages.doctor_not_found')], 404);
+            if (!$department)
+                return response()->json(['message' => __('messages.department_not_found')], 404);
 
- $validator = Validator::make(request()->all(), [
+            $validator = Validator::make(request()->all(), [
                 'first_name' => 'required',
                 'last_name' => 'required',
                 'bio' => 'required',
@@ -127,21 +128,22 @@ try{
             if ($validator->fails()) {
                 return response()->json($validator->errors()->toJson(), 400);
             }
-            User::where('id',$doctor->user_id)->update(['first_name'=>request('first_name'),
-            'last_name'=>request('last_name'),
-             'phone'=>request('phone'),
-             'email'=>request('email'),
-        ]);
-        $doctor->update([
-'bio'=>request('bio'),
-             'department_id'=>request('department'),
-             'subscription'=>request('subscription'),
-             'price_of_examination'=>request('price_of_examination'),
+            User::where('id', $doctor->user_id)->update([
+                'first_name' => request('first_name'),
+                'last_name' => request('last_name'),
+                'phone' => request('phone'),
+                'email' => request('email'),
+            ]);
+            $doctor->update([
+                'bio' => request('bio'),
+                'department_id' => request('department'),
+                'subscription' => request('subscription'),
+                'price_of_examination' => request('price_of_examination'),
 
-        ]);
-}catch(\Exception $e){
-    return response()->json(['error' => $e->getMessage()], 500);
-}
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
     public function deleteSecretary()
     {
@@ -151,7 +153,7 @@ try{
                 $secretary->delete();
                 return null;
             }
-            return "No secretary account for delete it";
+            return __('messages.no_secretary_account_for_delete');
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -163,7 +165,7 @@ try{
         if (!$locale) {
             return [
                 'status' => 400,
-                'message' => 'you must enter the lang type'
+                'message' => __('messages.language_required')
             ];
         }
         try {
@@ -185,7 +187,7 @@ try{
             $department = Department::where("name->{$locale}", request('department'))->first();
 
             if (!$department) {
-                return response()->json(['error' => 'Department not found'], 404);
+                return response()->json(['error' => __('messages.department_not_found')], 404);
             }
             $user = User::create([
                 'email' => request('email'),
@@ -227,7 +229,7 @@ try{
                 User::destroy($doctor->user_id);
                 return null;
             }
-            return "Doctor Not Found";
+            return __('messages.doctor_not_found');
         } catch (\Exception $e) {
             throw $e;
         }
@@ -286,7 +288,7 @@ try{
                 User::destroy($id);
                 return null;
             }
-            return "User Not Found";
+            return __('messages.user_not_found');
         } catch (\Exception $e) {
             throw $e;
         }

@@ -18,22 +18,22 @@ class SecretaryController extends Controller
     {
         $data = $this->SecretaryServece->reverse();
         return match ($data['status']) {
-            201 => $this->response(" Created Successfully", ['apointment' => $data['data']], 201),
-            400 => $this->response("Validation failed", $data['errors'], 400),
+            201 => $this->response(__('messages.appointment_added_successfully'), ['apointment' => $data['data']], 201),
+            400 => $this->response(__('messages.validation_failed'), $data['errors'], 400),
             404 => $this->response($data['message'], null, 404),
-            500 => $this->response("Server error: " . $data['error'], null, 500),
-            default => $this->response("Unknown error", null, 520),
+            500 => $this->response(__('messages.server_error', ['error' => $data['error'] ?? '']), null, 500),
+            default => $this->response(__('messages.unknown_error'), null, 520),
         };
     }
     public function reverseUnApp()
     {
         $data = $this->SecretaryServece->reverseUnApp();
         return match ($data['status']) {
-            201 => $this->response(" Created Successfully", ['apointment' => $data['data']], 201),
-            400 => $this->response("Validation failed", $data['errors'], 400),
+            201 => $this->response(__('messages.appointment_added_successfully'), ['apointment' => $data['data']], 201),
+            400 => $this->response(__('messages.validation_failed'), $data['errors'], 400),
             404 => $this->response($data['message'], null, 404),
-            500 => $this->response("Server error: " . $data['error'], null, 500),
-            default => $this->response("Unknown error", null, 520),
+            500 => $this->response(__('messages.server_error', ['error' => $data['error'] ?? '']), null, 500),
+            default => $this->response(__('messages.unknown_error'), null, 520),
         };
     }
     public function acceptReverse($id)
@@ -43,8 +43,8 @@ class SecretaryController extends Controller
             200 => $this->response($data['message'], ['appointment' => $data['data']], 200),
             400 => $this->response($data['message'], null, 400),
             404 => $this->response($data['message'], null, 404),
-            500 => $this->response("Server error: " . $data['error'], null, 500),
-            default => $this->response("Unknown error", null, 520),
+            500 => $this->response(__('messages.server_error', ['error' => $data['error'] ?? '']), null, 500),
+            default => $this->response(__('messages.unknown_error'), null, 520),
         };
     }
     public function rejectReverse($id)
@@ -54,8 +54,8 @@ class SecretaryController extends Controller
             200 => $this->response($data['message'], ['appointment' => null], 200),
             400 => $this->response($data['message'], null, 400),
             404 => $this->response($data['message'], null, 404),
-            500 => $this->response("Server error: " . $data['error'], null, 500),
-            default => $this->response("Unknown error", null, 520),
+            500 => $this->response(__('messages.server_error', ['error' => $data['error'] ?? '']), null, 500),
+            default => $this->response(__('messages.unknown_error'), null, 520),
         };
     }
     public function appointments($doctor_id, $appointment_date)
@@ -66,8 +66,8 @@ class SecretaryController extends Controller
             200 => $this->response($data['message'], $data['data'], 200),
             400 => $this->response($data['errors'], null, 400),
             404 => $this->response($data['message'], null, 404),
-            500 => $this->response("Server error: " . $data['error'], null, 500),
-            default => $this->response("Unknown error", null, 520),
+            500 => $this->response(__('messages.server_error', ['error' => $data['error'] ?? '']), null, 500),
+            default => $this->response(__('messages.unknown_error'), null, 520),
         };
     }
 
@@ -76,11 +76,11 @@ class SecretaryController extends Controller
 
         $data = $this->SecretaryServece->search();
         return match ($data['status']) {
-            200 => $this->response("Here are the results", ['results' => $data['data']], 200),
-            404 => $this->response("No results found", null, 404),
-            422 => $this->response("Validation error: missing search query", null, 422),
-            500 => $this->response("Server error: " . $data['error'], null, 500),
-            default => $this->response("Unknown error", null, 520),
+            200 => $this->response(__('messages.found_successfully'), ['results' => $data['data']], 200),
+            404 => $this->response(__('messages.no_results_found'), null, 404),
+            422 => $this->response(__('messages.validation_failed'), null, 422),
+            500 => $this->response(__('messages.server_error', ['error' => $data['error'] ?? '']), null, 500),
+            default => $this->response(__('messages.unknown_error'), null, 520),
         };
     }
     public function apointments()
@@ -89,8 +89,8 @@ class SecretaryController extends Controller
         return match ($data['status']) {
             200 => $this->response($data['message'], $data['data'], 200),
             404 => $this->response($data['message'], null, 404),
-            500 => $this->response("Server error: " . $data['error'], null, 500),
-            default => $this->response("Unknown error", null, 520)
+            500 => $this->response(__('messages.server_error', ['error' => $data['error'] ?? '']), null, 500),
+            default => $this->response(__('messages.unknown_error'), null, 520)
         };
     }
     public function monthlyLeaves()
@@ -99,8 +99,8 @@ class SecretaryController extends Controller
         return match ($data['status']) {
             200 => $this->response($data['message'], $data['data'], 200),
             400 => $this->response($data['message'], null, 400),
-            500 => $this->response("Server error: " . $data['error'], null, 500),
-            default => $this->response("Unknown error", null, 520)
+            500 => $this->response(__('messages.server_error', ['error' => $data['error'] ?? '']), null, 500),
+            default => $this->response(__('messages.unknown_error'), null, 520)
         };
     }
 
@@ -122,7 +122,7 @@ class SecretaryController extends Controller
                 207
             ),
             400 => $this->response(
-                "Validation failed",
+                __('messages.validation_failed'),
                 ['errors' => $data['errors']],
                 400
             ),
@@ -137,12 +137,12 @@ class SecretaryController extends Controller
                 409
             ),
             500 => $this->response(
-                "Server error: " . ($data['errors'] ?? $data['message']),
+                __('messages.server_error', ['error' => $data['errors'] ?? $data['message'] ?? '']),
                 null,
                 500
             ),
             default => $this->response(
-                "Unknown error",
+                __('messages.unknown_error'),
                 null,
                 520
             ),
@@ -152,9 +152,9 @@ class SecretaryController extends Controller
     {
         $data = $this->SecretaryServece->removeMonthlyleaves();
         return match ($data['status']) {
-            200 => $this->response("Removed all monthly leaves", null, 200),
+            200 => $this->response(__('messages.all_monthly_leaves'), null, 200),
             500 => $this->response($data['error'], null, 500),
-            default => $this->response("Unknown error", null, 520),
+            default => $this->response(__('messages.unknown_error'), null, 520),
         };
 
 
@@ -166,7 +166,7 @@ class SecretaryController extends Controller
             200 => $this->response($data['message'], null, 200),
             404 => $this->response($data['message'], null, 404),
             500 => $this->response($data['error'], null, 500),
-            default => $this->response("Unknown error", null, 520),
+            default => $this->response(__('messages.unknown_error'), null, 520),
         };
     }
     public function enterPatient($id)
@@ -177,29 +177,29 @@ class SecretaryController extends Controller
             404 => $this->response($data['message'], null, 404),
             400 => $this->response($data['message'], null, 400),
             500 => $this->response($data['error'], null, 500),
-            default => $this->response("Unknown error", null, 520),
+            default => $this->response(__('messages.unknown_error'), null, 520),
         };
     }
-      public function secretaryInfo($dayId)
+    public function secretaryInfo($dayId)
     {
         $data = $this->SecretaryServece->secretaryInfo($dayId);
         return match ($data['status']) {
-            200 => $this->response($data['message'],  $data['data'], 200),
+            200 => $this->response($data['message'], $data['data'], 200),
             400 => $this->response($data['message'], null, 400),
             404 => $this->response($data['message'], null, 404),
-            500 => $this->response("Server error: " . $data['error'], null, 500),
-            default => $this->response("Unknown error", null, 520),
+            500 => $this->response(__('messages.server_error', ['error' => $data['error'] ?? '']), null, 500),
+            default => $this->response(__('messages.unknown_error'), null, 520),
         };
     }
-  public function getDoctors()
-{
-    $data = $this->SecretaryServece->getDoctors();
+    public function getDoctors()
+    {
+        $data = $this->SecretaryServece->getDoctors();
 
-    return match ($data['status']) {
-        200 => $this->response($data['message'], ['doctors' => $data['data']], 200),
-        404 => $this->response($data['message'], null, 404),
-        500 => $this->response("Server error: " . $data['error'], null, 500),
-        default => $this->response("Unknown error", null, 520),
-    };
-}
+        return match ($data['status']) {
+            200 => $this->response($data['message'], ['doctors' => $data['data']], 200),
+            404 => $this->response($data['message'], null, 404),
+            500 => $this->response(__('messages.server_error', ['error' => $data['error'] ?? '']), null, 500),
+            default => $this->response(__('messages.unknown_error'), null, 520),
+        };
+    }
 }

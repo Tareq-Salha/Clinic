@@ -14,10 +14,11 @@ use App\Models\PaymentCompany;
 use App\Models\Preview;
 use App\Notifications\EnterPatient as NotificationsEnterPatient;
 use App\Notifications\Reverse;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
-use Carbon\Carbon;
 
 class SecretaryService
 {
@@ -77,7 +78,7 @@ class SecretaryService
 
             return [
                 'status' => 201,
-                'message' => 'Appointment added successfully',
+                'message' => __('messages.appointment_added_successfully'),
                 'data' => [
                     'appointment' => $appointment,
                     'patient' => $patient->makeHidden(array_merge($patient->getEncryptableFields(), ['created_at', 'updated_at']))
@@ -117,14 +118,14 @@ class SecretaryService
             if (!$patient) {
                 return [
                     'status' => 404,
-                    'message' => 'Patient not found'
+                    'message' => __('messages.patient_not_found')
                 ];
             }
 
             if (!$doctor) {
                 return [
                     'status' => 404,
-                    'message' => 'Doctor not found'
+                    'message' => __('messages.doctor_not_found')
                 ];
             }
 
@@ -146,7 +147,7 @@ class SecretaryService
             $appointment->patient;
             return [
                 'status' => 201,
-                'message' => 'Appointment added successfully',
+                'message' => __('messages.appointment_added_successfully'),
                 'data' => $appointment,
             ];
 
@@ -168,13 +169,13 @@ class SecretaryService
             if (!$appointment) {
                 return [
                     'status' => 404,
-                    'message' => 'Appointment not found',
+                    'message' => __('messages.appointment_not_found'),
                 ];
             }
             if ($appointment->status === 'accepted') {
                 return [
                     'status' => 400,
-                    'message' => 'You already accepted this appointment.',
+                    'message' => __('messages.appointment_already_accepted'),
                 ];
             }
             $conflict = Apointment::where('department_id', $appointment->department_id)
@@ -186,7 +187,7 @@ class SecretaryService
             if ($conflict) {
                 return [
                     'status' => 400,
-                    'message' => 'Cannot accept this appointment. There is already an accepted appointment at the same time.',
+                    'message' => __('messages.appointment_conflict'),
                 ];
             }
             $appointment->update(['status' => 'accepted']);
@@ -206,7 +207,7 @@ class SecretaryService
 
             return [
                 'status' => 200,
-                'message' => 'Appointment accepted successfully.',
+                'message' => __('messages.appointment_accepted_successfully'),
                 'data' => $appointment,
             ];
 
@@ -223,7 +224,7 @@ class SecretaryService
         try {
             $appointment = Apointment::find($id);
             if (!$appointment)
-                return ['status' => 404, 'message' => "Appointment not found"];
+                return ['status' => 404, 'message' => __('messages.appointment_not_found')];
             $patient = Patient::find($appointment->patient_id);
             $user = $patient->user;
             if ($user) {
@@ -255,7 +256,7 @@ class SecretaryService
                 Notification::send($user, new Reverse("Your appointment has been rejected reverse again"));
             }
 
-            return ['status' => 200, 'message' => "Appointment rejected sucssfully", 'data' => null];
+            return ['status' => 200, 'message' => __('messages.appointment_rejected_successfully'), 'data' => null];
         } catch (\Exception $e) {
             return [
                 'status' => 500,
@@ -277,14 +278,14 @@ class SecretaryService
 
             return [
                 'status' => 200,
-                'message' => 'Appointments found.',
+                'message' => __('messages.appointments_found'),
                 'data' => ['appointments' => $appointments]
             ];
 
         } catch (\Exception $e) {
             return [
                 'status' => 500,
-                'message' => 'Something went wrong.',
+                'message' => __('messages.server_error', ['error' => $e->getMessage()]),
                 'error' => $e->getMessage()
             ];
         }
@@ -294,8 +295,8 @@ class SecretaryService
         try {
             $all = MounthlyLeave::all();
             if ($all->isEmpty())
-                return ['status' => 400, 'message' => 'No monthly leaves'];
-            return ['status' => 200, 'message' => 'That is all monthly leaves', 'data' => $all];
+                return ['status' => 400, 'message' => __('messages.no_monthly_leaves')];
+            return ['status' => 200, 'message' => __('messages.all_monthly_leaves'), 'data' => $all];
         } catch (\Exception $e) {
             return ['status' => 500, 'errors' => $e->getMessage()];
         }
@@ -314,7 +315,7 @@ class SecretaryService
                 if (!isset($request['doctor_id']) || !isset($request['day_id'])) {
                     $errors[] = [
                         'index' => $index,
-                        'message' => "Missing doctor_id or day_id",
+                        'message' => __('messages.missing_doctor_or_day_id'),
                         'request' => $request
                     ];
                     continue;
@@ -324,7 +325,7 @@ class SecretaryService
                 if (!$day) {
                     $errors[] = [
                         'index' => $index,
-                        'message' => "Day Not Found (ID: {$request['day_id']})",
+                        'message' => __('messages.day_not_found_with_id', ['id' => $request['day_id']]),
                         'request' => $request
                     ];
                     continue;
@@ -332,7 +333,7 @@ class SecretaryService
                 if (!$doctor) {
                     $errors[] = [
                         'index' => $index,
-                        'message' => "Doctor Not Found (ID: {$request['doctor_id']})",
+                        'message' => __('messages.doctor_not_found_with_id', ['id' => $request['doctor_id']]),
                         'request' => $request
                     ];
                     continue;
@@ -352,7 +353,7 @@ class SecretaryService
                     $dayName = $day->available_days;
                     $errors[] = [
                         'index' => $index,
-                        'message' => "Doctor {$doctorName}  can't take  Day {$dayName} because it is already taken by another doctor in the same department",
+                        'message' => __('messages.doctor_day_conflict', ['doctor' => $doctorName, 'day' => $dayName]),
                         'request' => $request
                     ];
                 }
@@ -361,7 +362,7 @@ class SecretaryService
             return [
                 'status' => (count($errors) > 0 && count($createdLeaves) > 0) ? 207 : // Multi-status
                     (count($errors) > 0 ? 400 : 201),
-                'message' => count($createdLeaves) . ' leaves created, ' . count($errors) . ' errors',
+                'message' => __('messages.leave_creation_summary', ['created' => count($createdLeaves), 'errors' => count($errors)]),
                 'data' => $createdLeaves,
                 'errors' => $errors
             ];
@@ -369,7 +370,7 @@ class SecretaryService
         } catch (\Exception $e) {
             return [
                 'status' => 500,
-                'message' => 'Server Error',
+                'message' => __('messages.server_error', ['error' => $e->getMessage()]),
                 'errors' => $e->getMessage()
             ];
         }
@@ -379,7 +380,7 @@ class SecretaryService
         try {
             $query = request('search');
             if (!$query) {
-                return ['status' => 422, 'message' => 'Search query is required'];
+                return ['status' => 422, 'message' => __('messages.search_query_required')];
             }
 
 
@@ -394,7 +395,7 @@ class SecretaryService
                 ;
             });
             if ($appointments->isEmpty()) {
-                return ['status' => 404, 'message' => 'No appointments found'];
+                return ['status' => 404, 'message' => __('messages.no_appointments_found')];
             }
 
             return [
@@ -429,8 +430,8 @@ class SecretaryService
         try {
             $apointments = Apointment::orderBy('apointment_date', 'ASC')->with(['patient', 'doctor.user', 'department'])->get();
             if ($apointments->isEmpty())
-                return ['status' => 404, 'message' => 'No appointments yet'];
-            return ['status' => 200, 'message' => 'That is all appointments', 'data' => $apointments];
+                return ['status' => 404, 'message' => __('messages.no_appointments_yet')];
+            return ['status' => 200, 'message' => __('messages.all_appointments_returned'), 'data' => $apointments];
         } catch (\Exception $e) {
             return [
                 'status' => 500,
@@ -444,7 +445,7 @@ class SecretaryService
             $appointments = Apointment::where('status', 'accepted')->get();
 
             if ($appointments->isEmpty()) {
-                return ['status' => 404, 'message' => 'No accepted appointments found'];
+                return ['status' => 404, 'message' => __('messages.no_accepted_appointments_found')];
             }
 
             foreach ($appointments as $appointment) {
@@ -470,7 +471,7 @@ class SecretaryService
                 $appointment->delete();
             }
 
-            return ['status' => 200, 'message' => 'Release rates processed successfully'];
+            return ['status' => 200, 'message' => __('messages.release_rates_processed_successfully')];
         } catch (\Exception $e) {
             return [
                 'status' => 500,
@@ -487,11 +488,11 @@ class SecretaryService
                 $existingPreview = Apointment::where('enter', 1)->where('doctor_id', $apointment->doctor_id)->exists();
 
                 if ($existingPreview) {
-                    return ['status' => 400, 'message' => "Alreday have patient now"];
+                    return ['status' => 400, 'message' => __('messages.enter_patient_already_active')];
                 }
                 $existingEnter = Apointment::where('enter', true)->where('doctor_id', $apointment->doctor_id)->exists();
                 if ($existingEnter)
-                    return ['status' => 400, 'message' => "Alreday have a patient now"];
+                    return ['status' => 400, 'message' => __('messages.enter_patient_already_active')];
                 $apointment->update(['enter' => true]);
                 $apointment->save();
                 $preview = Preview::with('medical_analysis')->where('patient_id', $apointment->patient_id)
@@ -515,10 +516,10 @@ class SecretaryService
                 $apointment->doctor->notify(new NotificationsEnterPatient("That is your patient", $apointment->patient));
 
                 event(new EnterPatient("That is your patient", $apointment->doctor_id, $apointment->patient, $preview));
-                return ['status' => 200, 'message' => "Enter patient done"];
+                return ['status' => 200, 'message' => __('messages.enter_patient_successful')];
 
             }
-            return ['status' => 404, 'message' => "Appointment not found"];
+            return ['status' => 404, 'message' => __('messages.appointment_not_found')];
         } catch (\Exception $e) {
             return [
                 'status' => 500,
@@ -532,7 +533,7 @@ class SecretaryService
         try {
             $day = Day::find($dayId);
             if (!$day) {
-                return ['status' => 404, 'message' => 'Day not found'];
+                return ['status' => 404, 'message' => __('messages.day_not_found')];
             }
             // $departments = Department::with(['doctors' => function($query) use ($dayId) {
             //     $query->whereHas('days', function($q) use ($dayId) {
@@ -543,12 +544,12 @@ class SecretaryService
             // }])->get();
             $entered = Apointment::where('enter', 1)->with(['doctor', 'doctor.department', 'patient'])->get();
             if ($entered->isEmpty()) {
-                return ['status' => 400, 'message' => 'No appointments yet', 'data' => null];
+                return ['status' => 400, 'message' => __('messages.no_appointments_yet'), 'data' => null];
             }
 
             return [
                 'status' => 200,
-                'message' => 'Secretary information retrieved successfully',
+                'message' => __('messages.secretary_info_retrieved_successfully'),
                 'data' => [
 
                     'entered_patients' => $entered
@@ -565,7 +566,7 @@ class SecretaryService
         try {
             $doctors = Doctor::with(['user', 'department', 'apointments.patient', 'days'])->withAverageRating()->get();
             if ($doctors->isEmpty()) {
-                return ['status' => 404, 'message' => 'No doctors found'];
+                return ['status' => 404, 'message' => __('messages.no_doctors_found_general')];
             }
             $formattedDoctors = $doctors->map(function ($doctor) {
                 $todayName = Carbon::now()->format('l');
@@ -598,7 +599,7 @@ class SecretaryService
             });
             return [
                 'status' => 200,
-                'message' => 'Doctors retrieved successfully',
+                'message' => __('messages.doctors_retrieved_successfully'),
                 'data' => $formattedDoctors
             ];
         } catch (\Exception $e) {

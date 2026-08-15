@@ -16,42 +16,44 @@ class AdminController extends Controller
     {
         $this->AdminService = $AdminService;
     }
-  public function createSecretary()
-{
-    $data = $this->AdminService->createSecretary();
-//  if ($data['msg']) {
+    public function createSecretary()
+    {
+        $data = $this->AdminService->createSecretary();
+        //  if ($data['msg']) {
 //             return $this->response($data['msg'], null, 400);
 //         }
-    return match ($data['status']) {
-        201 => $this->response("Secretary Created Successfully", ['secretary' => $data['user']], 201),
-        400 => $this->response("Validation failed", $data['errors'], 400),
-        409 => $this->response("Secretary already exists", null, 409),
-        500 => $this->response("Server error: " . $data['error'], null, 500),
-        default => $this->response("Unknown error", null, 520),
-    };
-}
+        return match ($data['status']) {
+            201 => $this->response(__('message.secretary_created_successfully'), ['secretary' => $data['user']], 201),
+            400 => $this->response(__('message.validation_failed'), $data['errors'], 400),
+            409 => $this->response(__('message.secretary_already_exists'), null, 409),
+            500 => $this->response(__('message.server_error', ['error' => $data['error']]), null, 500),
+            default => $this->response(__('message.unknown_error'), null, 520),
+        };
+    }
 
-    public function updateSecretary(){
-        $data=$this->AdminService->updateSecretary();
-         if ($data->original) {
+    public function updateSecretary()
+    {
+        $data = $this->AdminService->updateSecretary();
+        if ($data->original) {
             return $this->response($data->original, null, 400);
         }
-        return $this->response("Secratery Updated Successfully", ['secratery' => $data], 200);
+        return $this->response(__('message.secretary_updated_successfully'), ['secretary' => $data], 200);
     }
-    public function updateDoctor($id){
-        $data=$this->AdminService->updateDoctor($id);
-  if ($data->original) {
+    public function updateDoctor($id)
+    {
+        $data = $this->AdminService->updateDoctor($id);
+        if ($data->original) {
             return $this->response($data->original, null, 400);
         }
-        return $this->response("Doctor Updated Successfully", ['doctor' => $data], 200);
+        return $this->response(__('message.doctor_updated_successfully'), ['doctor' => $data], 200);
     }
-     public function deleteSecretary()
+    public function deleteSecretary()
     {
         $data = $this->AdminService->deleteSecretary();
         if ($data == null) {
-            return $this->response("Secretary deleted Successfully", ['secretary' => null], 200);
+            return $this->response(__('message.secretary_deleted_successfully'), ['secretary' => null], 200);
         }
-        return $this->response($data,null,400);
+        return $this->response($data, null, 400);
     }
     public function createDoctor()
     {
@@ -59,7 +61,7 @@ class AdminController extends Controller
         if ($data->original) {
             return $this->response($data->original, null, 400);
         }
-        return $this->response("Doctor Created Successfully", ['doctor' => $data], 201);
+        return $this->response(__('message.doctor_created_successfully'), ['doctor' => $data], 201);
     }
 
 
@@ -68,7 +70,7 @@ class AdminController extends Controller
     {
         $data = $this->AdminService->deleteDoctor($id);
         if ($data == null) {
-            return $this->response("Doctor deleted Successfully", ['doctor' => null], 200);
+            return $this->response(__('message.doctor_deleted_successfully'), ['doctor' => null], 200);
         }
     }
 
@@ -80,7 +82,7 @@ class AdminController extends Controller
         if ($data->original) {
             return $this->response($data->original, null, 400);
         }
-        return $this->response("Department Created Successfully", ['department' => $data], 201);
+        return $this->response(__('message.department_created_successfully'), ['department' => $data], 201);
     }
 
 
@@ -88,7 +90,7 @@ class AdminController extends Controller
     {
         $data = $this->AdminService->deleteDepartment($id);
         if ($data == null) {
-            return $this->response("Department deleted Successfully", ['department' => null], 200);
+            return $this->response(__('message.department_deleted_successfully'), ['department' => null], 200);
         }
     }
 
@@ -98,8 +100,8 @@ class AdminController extends Controller
     {
         $data = $this->AdminService->deleteUser($id);
         if ($data == null) {
-            return $this->response("User deleted Successfully", ['user' => null], 200);
+            return $this->response(__('message.user_deleted_successfully'), ['user' => null], 200);
         }
-        return $this->response("User not found", ['user' => null], 404);
+        return $this->response(__('message.user_not_found'), ['user' => null], 404);
     }
 }

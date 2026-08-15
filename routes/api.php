@@ -6,6 +6,7 @@ use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PatientController;
 use App\Http\Middleware\DoctorMiddleware;
 use App\Http\Middleware\PatientMiddleware;
+use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\TwoFactor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -38,7 +39,7 @@ Route::group([
     Route::get('/resendCode', [TwoFactorController::class, 'resendCode']);
 });
 Route::group(
-    ['middleware' => ['api', 'auth', AdminMiddleWare::class, TwoFactor::class]],
+    ['middleware' => ['api', 'auth', AdminMiddleWare::class, SetLocale::class, TwoFactor::class]],
     function ($router) {
         Route::post('admin/secretary', [AdminController::class, 'createSecretary']);
         Route::put('admin/secretary', [AdminController::class, 'updateSecretary']);
@@ -54,7 +55,7 @@ Route::group(
 );
 
 Route::group([
-    'middleware' => [TwoFactor::class, DoctorMiddleware::class, 'api', 'auth']
+    'middleware' => [TwoFactor::class, DoctorMiddleware::class, SetLocale::class, 'api', 'auth']
 ], function ($router) {
     Route::post('/postArticle', [DoctorController::class, 'postArticale']);
     Route::put('/updateArticle/{id}', [DoctorController::class, 'updateArticle']);
@@ -118,7 +119,7 @@ Route::group([
 
 
 Route::group([
-    'middleware' => [TwoFactor::class, SecretaryMiddleware::class, 'api', 'auth']
+    'middleware' => [TwoFactor::class, SecretaryMiddleware::class, SetLocale::class, 'api', 'auth']
 ], function ($router) {
     Route::post('secretary/leave/', [SecretaryController::class, 'addMounthlyLeaves']);
     Route::delete('secretary/leave', [SecretaryController::class, 'removeMonthlyLeaves']);
@@ -137,7 +138,7 @@ Route::group([
     Route::get('secretary/manage/{dayId}', [SecretaryController::class, 'secretaryInfo']);
 });
 //////Any Body Can Access
-Route::group(['middleware' => [TwoFactor::class, 'api', 'auth']], function ($router) {
+Route::group(['middleware' => [TwoFactor::class, SetLocale::class, 'api', 'auth']], function ($router) {
 
     Route::get('/doctor', [UserController::class, 'getDoctors']);
     Route::get('/department', [UserController::class, 'getDepartments']);

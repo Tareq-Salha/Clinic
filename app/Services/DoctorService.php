@@ -106,10 +106,10 @@ class DoctorService
             'body' => $request->body
         ]);
         if ($post) {
-            $message = 'articale created successfully';
+            $message = __('messages.article_created_successfully');
             $code = 200;
         } else {
-            $message = 'somthing went wrong the post not created';
+            $message = __('messages.article_created_failed');
             $code = 400;
         }
         return ['message' => $message, 'post' => $post, 'code' => $code];
@@ -126,10 +126,10 @@ class DoctorService
                 'password' => $request->password
             ]);
             $user->save();
-            $message = 'profile updated successfully';
+            $message = __('messages.profile_updated_successfully');
             $code = 200;
         } else {
-            $message = "user not found";
+            $message = __('messages.user_not_found');
             $code = 404;
         }
         return ['message' => $message, 'user' => $user, 'code' => $code];
@@ -163,14 +163,14 @@ class DoctorService
                             Storage::disk('public')->delete($oldPath);
                     }
                 }
-                $message = 'article updated successfully';
+                $message = __('messages.article_updated_successfully');
                 $code = 200;
             } else {
-                $message = 'article updated failed';
+                $message = __('messages.article_updated_failed');
                 $code = 400;
             }
         } else {
-            $message = "article not found";
+            $message = __('messages.article_not_found');
             $code = 404;
         }
         return ['article' => $article, 'message' => $message, 'code' => $code];
@@ -194,14 +194,14 @@ class DoctorService
                         $deleted[] = $storagePath;
                     }
                 }
-                $message = 'article deleted successfully';
+                $message = __('messages.article_deleted_successfully');
                 $code = 200;
             } else {
-                $message = 'article deleted failed';
+                $message = __('messages.article_deleted_failed');
                 $code = 400;
             }
         } else {
-            $message = "article not found";
+            $message = __('messages.article_not_found');
             $code = 404;
         }
         return ['article' => $article, 'message' => $message, 'code' => $code];
@@ -212,7 +212,7 @@ class DoctorService
         if (!$user) {
             return [
                 'data' => null,
-                'message' => "User not found",
+                'message' => __('messages.user_not_found'),
                 'code' => 404
             ];
         }
@@ -220,7 +220,7 @@ class DoctorService
         if (!$doctor) {
             return [
                 'data' => null,
-                'message' => "Doctor profile not found",
+                'message' => __('messages.doctor_profile_not_found'),
                 'code' => 404
             ];
         }
@@ -233,7 +233,7 @@ class DoctorService
         ];
         return [
             'data' => $responseData,
-            'message' => 'Articles returned successfully',
+            'message' => __('messages.articles_returned_successfully'),
             'code' => 200
         ];
     }
@@ -241,7 +241,7 @@ class DoctorService
     {
         $user = auth()->user();
         if (!$user) {
-            $message = "user not found";
+            $message = __('messages.user_not_found');
             $code = 404;
             return ['message' => $message, 'article' => null, 'code' => $code];
         }
@@ -249,10 +249,10 @@ class DoctorService
         $article = $doctor->posts()->where('id', $id)->first();
         if ($article) {
             $article = $this->addDoctorInfo($article, $doctor, $user);
-            $message = "article return successfully";
+            $message = __('messages.article_returned_successfully');
             $code = 200;
         } else {
-            $message = "article not found";
+            $message = __('messages.article_not_found');
             $code = 404;
         }
         return ['article' => $article, 'message' => $message, 'code' => $code];
@@ -261,7 +261,7 @@ class DoctorService
     {
         $user = auth()->user();
         if (!$user) {
-            $message = "user not found";
+            $message = __('messages.user_not_found');
             $code = 404;
             return ['message' => $message, 'data' => null, 'code' => $code];
         }
@@ -287,10 +287,10 @@ class DoctorService
                 $formatedAppointments[] = $apointmentData;
             }
             $doctorInfo = $this->addDoctorInfo([], $doctor, $user)['doctor_info'];
-            $message = 'apointments return successfully';
+            $message = __('messages.appointments_returned_successfully');
             $code = 200;
         } else {
-            $message = 'apointments not found';
+            $message = __('messages.appointments_not_found');
             $code = 404;
         }
         return
@@ -370,14 +370,14 @@ class DoctorService
                     event(new \App\Events\OutPatient('I am finshed from this patient please enter the next one', $scretary->id));
                 }
 
-                $message = "preview updated successfully";
+                $message = __('messages.preview_updated_successfully');
                 $code = 200;
             } else {
-                $message = "preview updated failed";
+                $message = __('messages.preview_updated_failed');
                 $code = 400;
             }
         } else {
-            $message = "preview not found";
+            $message = __('messages.preview_not_found');
             $code = 404;
         }
         return ['message' => $message, 'preview' => $preview, 'code' => $code];
@@ -389,14 +389,14 @@ class DoctorService
             $deletedPreview = $preview->delete();
             if ($deletedPreview) {
                 $code = 200;
-                $message = "preview deleted successfully";
+                $message = __('messages.preview_deleted_successfully');
             } else {
                 $code = 400;
-                $message = "preview deleted failed";
+                $message = __('messages.preview_deleted_failed');
             }
         } else {
             $code = 404;
-            $message = "preview not found";
+            $message = __('messages.preview_not_found');
         }
         return ['message' => $message, 'preview' => $preview, 'code' => $code];
     }
@@ -406,7 +406,7 @@ class DoctorService
         if (!$user) {
             return [
                 'data' => null,
-                'message' => "User not found",
+                'message' => __('messages.user_not_found'),
                 'code' => 404
             ];
         }
@@ -414,7 +414,7 @@ class DoctorService
         if (!$doctor) {
             return [
                 'data' => null,
-                'message' => "Doctor profile not found",
+                'message' => __('messages.doctor_not_found'),
                 'code' => 404
             ];
         }
@@ -423,7 +423,7 @@ class DoctorService
             ->get();
         return [
             'data' => $previews,
-            'message' => "Previews returned successfully",
+            'message' => __('messages.previews_returned_successfully'),
             'code' => 200
         ];
     }
@@ -431,14 +431,14 @@ class DoctorService
     {
         $doctor = auth()->user()->doctor;
         if (!$doctor) {
-            return ['message' => 'doctor not found', 'data' => null, 'code' => 404];
+            return ['message' => __('messages.doctor_not_found'), 'data' => null, 'code' => 404];
         }
         $preview = Preview::where('id', $preview_id)->where('doctor_id', $doctor->id)->first();
         if ($preview) {
-            $message = 'preview return successfully';
+            $message = __('messages.preview_returned_successfully');
             $code = 200;
         } else {
-            $message = "prevew not found";
+            $message = __('messages.preview_not_found');
             $code = 404;
         }
         return ['message' => $message, 'preview' => $preview, 'code' => $code];
@@ -447,7 +447,7 @@ class DoctorService
     {
         $doctor = auth()->user()->doctor;
         if (!$doctor) {
-            return ['message' => 'doctor not found', 'patients' => null, 'code' => 404];
+            return ['message' => __('messages.doctor_not_found'), 'patients' => null, 'code' => 404];
         }
         $previews = Preview::where('doctor_id', $doctor->id)->get();
         if ($previews) {
@@ -461,14 +461,14 @@ class DoctorService
                 $previedPatients[] = $patient;
             }
             if ($previedPatients) {
-                $message = "pateitns return successfully";
+                $message = __('messages.patients_returned_successfully');
                 $code = 200;
             } else {
-                $message = "we don't found any doctors";
+                $message = __('messages.no_patients_found');
                 $code = 404;
             }
         } else {
-            $message = "this doctor does not have any previed patients";
+            $message = __('messages.doctor_has_no_previewed_patients');
             $code = 400;
         }
         return ['message' => $message, 'patients' => $previedPatients, 'code' => $code];
@@ -477,7 +477,7 @@ class DoctorService
     {
         $keyword = request('query');
         if (!$keyword) {
-            return ['message' => 'search input is required', 'patients' => null, 'code' => 400];
+            return ['message' => __('messages.search_input_required'), 'patients' => null, 'code' => 400];
         }
         $doctor = auth()->user()->doctor;
         $doctorId = auth()->user()->doctor->id;
@@ -515,10 +515,11 @@ class DoctorService
             return $nameMatch || $userMatch || $sonsMatch || $previewsMatch;
         });
         if ($filteredPatients) {
-            $message = "found successfully";
+            $message = __('messages.patients_found_successfully');
             $code = 200;
         } else {
-            $message = "found failed";
+            $message = __('messages.patient_not_found');
+            $code = 404;
         }
         return ['message' => $message, 'patients' => $filteredPatients, 'code' => $code];
     }
@@ -526,7 +527,7 @@ class DoctorService
     {
         $doctor = auth()->user()->doctor;
         if (!$doctor) {
-            return ['message' => 'doctor not found', 'data' => null, 'code' => 404];
+            return ['message' => __('messages.doctor_not_found'), 'data' => null, 'code' => 404];
         }
         $apointmentPatient = Apointment::where('doctor_id', $doctor->id)->where('status', 'accepted')->where('enter', 1)->first();
         if ($apointmentPatient)
@@ -540,10 +541,10 @@ class DoctorService
                 if ($medicalAnalysis)
                     $allMedicalAnalysis[] = $medicalAnalysis;
             }
-            $message = "active patient info return successfully";
+            $message = __('messages.active_patient_info_returned_successfully');
             $code = 200;
         } else {
-            $message = "patient not found";
+            $message = __('messages.patient_not_found');
             $code = 404;
         }
         return [

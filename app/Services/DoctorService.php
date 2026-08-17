@@ -349,6 +349,7 @@ class DoctorService
     {
         $preview = Preview::find($preview_id);
         $patient = Patient::find($preview->patient_id);
+        $doctor = Doctor::find($preview->doctor_id);
         $patient->discount_point += $preview->price_after_discount / 1000;
         $patient->save();
         if ($preview) {
@@ -367,7 +368,7 @@ class DoctorService
                     $appointment->save();
                     $scretary = User::where('role', 'secretary')->first();
                     $scretary->notify(new OutPatient('I am finshed from this patient please enter the next one'));
-                    event(new \App\Events\OutPatient('I am finshed from this patient please enter the next one', $scretary->id));
+                    event(new \App\Events\OutPatient('I am finshed from this patient please enter the next one', $scretary->id, $appointment->id, $patient->first_name . " " . $patient->last_name, $doctor->user->first_name . " " . $doctor->user->last_name));
                 }
 
                 $message = __('messages.preview_updated_successfully');

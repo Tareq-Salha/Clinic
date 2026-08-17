@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class OutPatient
+class OutPatient implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -19,10 +19,16 @@ class OutPatient
      */
     protected $msg;
     protected $scretary_id;
-    public function __construct($msg, $scretary_id)
+    protected $appointment_id;
+    protected $patientName;
+    protected $doctorName;
+    public function __construct($msg, $scretary_id, $appointment_id, $patientName, $doctorName)
     {
         $this->msg = $msg;
         $this->scretary_id = $scretary_id;
+        $this->appointment_id = $appointment_id;
+        $this->patientName = $patientName;
+        $this->doctorName = $doctorName;
     }
 
     /**
@@ -41,6 +47,9 @@ class OutPatient
         return [
             'scretary_id' => $this->scretary_id,
             'message' => $this->msg,
+            'appointment_id' => $this->appointment_id,
+            'patientName' => $this->patientName,
+            'doctorName' => $this->doctorName,
             'timestamp' => now()->toDateTimeString()
         ];
     }

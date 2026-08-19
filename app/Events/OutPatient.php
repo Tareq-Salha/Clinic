@@ -39,7 +39,7 @@ class OutPatient implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('out-patient.' . $this->scretary_id),
+            new Channel('out-patient.' . $this->scretary_id),
         ];
     }
     public function broadcastWith()

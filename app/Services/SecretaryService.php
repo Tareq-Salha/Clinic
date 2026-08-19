@@ -503,6 +503,7 @@ class SecretaryService
                         'patient_id' => $apointment->patient_id,
                         'doctor_id' => $apointment->doctor_id,
                         'department_id' => $apointment->department_id,
+                        'apointment_id' => $apointment->id,
                         'diagnoseis' => "",
                         'diagnoseis_type' => false,
                         'medicine' => "",

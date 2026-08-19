@@ -315,9 +315,12 @@ class PatientService
         // }
         if ($appointment) {
             if ($appointment->status === "waiting") {
-                $updateData = [];
+                // $updateData = [];
                 if ($request->has('appointment_date') && $request->appointment_date !== null) {
-                    $updateData['apointment_date'] = $request->appointment_date;
+                    $appointment->update([
+                        'apointment_date' => $request->appointment_date
+                    ]);
+                    // $updateData['apointment_date'] = $request->appointment_date;
                 }
                 if ($request->has('payment_id') && $appointment->payment_id != $request->payment_id) {
                     $oldPayment = PaymentCompany::find($appointment->payment_id);
@@ -537,40 +540,40 @@ class PatientService
     }
     public function getPreviews()
     {
-    $user = auth()->user();
-    $patient = $user->patient;
-    if (!$patient) {
-        return ['message' => 'patient not found', 'previews' => null, 'code' => 404];
-    }
-    $sonPatientIds = Son::where('parent_id', $user->id)->pluck('patient_id')->toArray();
-    $allPatientIds = array_merge([$patient->id], $sonPatientIds);
-    $allPreviews = Preview::whereIn('patient_id', $allPatientIds)
-        ->with(['patient.user', 'doctor.user'])
-        ->get();
-    $allPreviews->transform(function ($preview) {
-        $previewUser = $preview->patient ?? null;
-        $doctorUser = $preview->doctor->user ?? null;
-        $preview->patientName = $previewUser ? $previewUser->first_name . ' ' . $previewUser->last_name : null;
-        $preview->doctorName = $doctorUser ? $doctorUser->first_name . ' ' . $doctorUser->last_name : null;
-        $preview->gender = $previewUser ? $previewUser->gender : null;
-        $preview->imgPath = $previewUser ? $previewUser->user?->img_path : null;
-        $preview->makeHidden(['patient', 'doctor']);
-        return $preview;
-    });
-    $formatedPreviews = [
-        'completePreviews'   => $allPreviews->where('patient_id', $patient->id)->where('diagnoseis_type', 1)->values(),
-        'partlyPreviews'     => $allPreviews->where('patient_id', $patient->id)->where('diagnoseis_type', 0)->values(),
-        'completePreviewsSons'  => $allPreviews->whereIn('patient_id', $sonPatientIds)->where('diagnoseis_type', 1)->values(),
-        'partlyPreviewsSons'         => $allPreviews->whereIn('patient_id', $sonPatientIds)->where('diagnoseis_type', 0)->values(),
-    ];
+        $user = auth()->user();
+        $patient = $user->patient;
+        if (!$patient) {
+            return ['message' => 'patient not found', 'previews' => null, 'code' => 404];
+        }
+        $sonPatientIds = Son::where('parent_id', $user->id)->pluck('patient_id')->toArray();
+        $allPatientIds = array_merge([$patient->id], $sonPatientIds);
+        $allPreviews = Preview::whereIn('patient_id', $allPatientIds)
+            ->with(['patient.user', 'doctor.user'])
+            ->get();
+        $allPreviews->transform(function ($preview) {
+            $previewUser = $preview->patient ?? null;
+            $doctorUser = $preview->doctor->user ?? null;
+            $preview->patientName = $previewUser ? $previewUser->first_name . ' ' . $previewUser->last_name : null;
+            $preview->doctorName = $doctorUser ? $doctorUser->first_name . ' ' . $doctorUser->last_name : null;
+            $preview->gender = $previewUser ? $previewUser->gender : null;
+            $preview->imgPath = $previewUser ? $previewUser->user?->img_path : null;
+            $preview->makeHidden(['patient', 'doctor']);
+            return $preview;
+        });
+        $formatedPreviews = [
+            'completePreviews' => $allPreviews->where('patient_id', $patient->id)->where('diagnoseis_type', 1)->values(),
+            'partlyPreviews' => $allPreviews->where('patient_id', $patient->id)->where('diagnoseis_type', 0)->values(),
+            'completePreviewsSons' => $allPreviews->whereIn('patient_id', $sonPatientIds)->where('diagnoseis_type', 1)->values(),
+            'partlyPreviewsSons' => $allPreviews->whereIn('patient_id', $sonPatientIds)->where('diagnoseis_type', 0)->values(),
+        ];
 
-    $hasPreviews = $allPreviews->isNotEmpty();
+        $hasPreviews = $allPreviews->isNotEmpty();
 
-    return [
-        'message'  => $hasPreviews ? "preview return successfully" : "no previews yet",
-        'previews' => $formatedPreviews,
-        'code'     => $hasPreviews ? 200 : 400
-    ];
+        return [
+            'message' => $hasPreviews ? "preview return successfully" : "no previews yet",
+            'previews' => $formatedPreviews,
+            'code' => $hasPreviews ? 200 : 400
+        ];
     }
     public function updatePatientProfile($request)
     {
@@ -1264,34 +1267,34 @@ class PatientService
         }
         return ['message' => $message, 'payment' => $payment, 'code' => $code];
     }
-   public function getAppointmentById($child_id)
-{
-    $user = auth()->user();
-    $patient = $user->patient;
-    if (!$patient) {
-        return ['message' => 'patient not found', 'appointment' => null, 'code' => 404];
-    }
-    $sonPatientIds = Son::where('parent_id', $user->id)->pluck('patient_id')->toArray();
-    $allPatientIds = array_merge([$patient->id], $sonPatientIds);
-    $appointment = Apointment::whereIn('patient_id', $allPatientIds)
-        ->with(['patient.user', 'doctor.user'])
-        ->where('patient_id', $child_id)
-        ->first();
-    if ($appointment) {
-        // $appointmentUser = $appointment->patient->user ?? null;
-        // $doctorUser = $appointment->doctor->user ?? null;
-        // $appointment->patientName = $appointmentUser ? $appointmentUser->name : null;
-        // $appointment->doctorName = $doctorUser ? $doctorUser->name : ($appointment->doctor->name ?? null);
-        // $appointment->gender = $appointmentUser ? $appointmentUser->gender : null;
-        // $appointment->imgPath = $appointmentUser ? $appointmentUser->img_path : null;
-        $appointment->makeHidden(['patient', 'doctor']);
-        $message = "appointment return successfully";
-        $code = 200;
-    } else {
-        $message = "appointment return failed";
-        $code = 404;
-    }
+    public function getAppointmentById($child_id)
+    {
+        $user = auth()->user();
+        $patient = $user->patient;
+        if (!$patient) {
+            return ['message' => 'patient not found', 'appointment' => null, 'code' => 404];
+        }
+        $sonPatientIds = Son::where('parent_id', $user->id)->pluck('patient_id')->toArray();
+        $allPatientIds = array_merge([$patient->id], $sonPatientIds);
+        $appointment = Apointment::whereIn('patient_id', $allPatientIds)
+            ->with(['patient.user', 'doctor.user'])
+            ->where('patient_id', $child_id)
+            ->first();
+        if ($appointment) {
+            // $appointmentUser = $appointment->patient->user ?? null;
+            // $doctorUser = $appointment->doctor->user ?? null;
+            // $appointment->patientName = $appointmentUser ? $appointmentUser->name : null;
+            // $appointment->doctorName = $doctorUser ? $doctorUser->name : ($appointment->doctor->name ?? null);
+            // $appointment->gender = $appointmentUser ? $appointmentUser->gender : null;
+            // $appointment->imgPath = $appointmentUser ? $appointmentUser->img_path : null;
+            $appointment->makeHidden(['patient', 'doctor']);
+            $message = "appointment return successfully";
+            $code = 200;
+        } else {
+            $message = "appointment return failed";
+            $code = 404;
+        }
 
-    return ['message' => $message, 'appointment' => $appointment, 'code' => $code];
-}
+        return ['message' => $message, 'appointment' => $appointment, 'code' => $code];
+    }
 }

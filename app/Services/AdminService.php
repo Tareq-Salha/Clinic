@@ -3,11 +3,14 @@
 namespace App\Services;
 
 use App\Mail\TwoFactorMail;
+use App\Models\Apointment;
 use App\Models\Department;
 use App\Models\Doctor;
+use App\Models\Patient;
 use App\Models\PaymentCompany;
 use App\Models\User;
 use App\UploadImageTrait;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
@@ -16,6 +19,98 @@ use Illuminate\Support\Facades\Validator;
 class AdminService
 {
     use UploadImageTrait;
+
+    public function dashboardStatistics(): array
+    {
+        try {
+            $now = Carbon::now();
+            $months = collect(range(6, 0))->map(function (int $monthsAgo) use ($now) {
+                $date = $now->copy()->subMonths($monthsAgo);
+
+                return [
+                    'name' => $date->format('M'),
+                    'visits' => Apointment::where('status', 'accepted')
+                        ->whereYear('apointment_date', $date->year)
+                        ->whereMonth('apointment_date', $date->month)
+                        ->count(),
+                ];
+            })->values()->all();
+
+            $weekStart = $now->copy()->startOfWeek();
+            $appointments = Apointment::whereBetween('apointment_date', [
+                $weekStart,
+                $weekStart->copy()->endOfWeek(),
+            ])->get(['status', 'apointment_date']);
+
+            $appointmentData = collect(range(0, 6))->map(function (int $day) use ($weekStart, $appointments) {
+                $date = $weekStart->copy()->addDays($day);
+                $dayAppointments = $appointments->filter(
+                    fn(Apointment $appointment) => $appointment->apointment_date->isSameDay($date)
+                );
+
+                return [
+                    'name' => $date->format('D'),
+                    'completed' => $dayAppointments->where('status', 'accepted')->count(),
+                    'pending' => $dayAppointments->where('status', 'waiting')->count(),
+                    'canceled' => $dayAppointments->where('status', 'rejected')->count(),
+                ];
+            })->values()->all();
+
+            $topDoctors = Doctor::with(['user', 'department'])
+                ->withCount('rates')
+                ->withAverageRating()
+                ->orderByDesc('average_rating')
+                ->limit(3)
+                ->get()
+                ->map(fn(Doctor $doctor) => [
+                    'id' => 'doc_' . $doctor->id,
+                    'name' => trim('Dr. ' . $doctor->user->first_name . ' ' . $doctor->user->last_name),
+                    'specialty' => $doctor->department?->name,
+                    'rating' => (float) $doctor->average_rating,
+                    'reviews' => $doctor->rates_count,
+                    'avatar' => strtoupper(substr($doctor->user->first_name, 0, 1) . substr($doctor->user->last_name, 0, 1)),
+                ])->values()->all();
+
+            $recentActivity = Apointment::with(['department', 'patient.user'])
+                ->latest()
+                ->limit(4)
+                ->get()
+                ->map(fn(Apointment $appointment) => [
+                    'id' => 'act_appointment_' . $appointment->id,
+                    'type' => $appointment->status === 'rejected' ? 'appointment_canceled' : 'appointment_booked',
+                    'description' => $appointment->status === 'rejected'
+                        ? (($appointment->department?->name ?? 'Department') . ' appointment canceled by patient.')
+                        : ('Appointment booked for ' . ($appointment->department?->name ?? 'Department') . '.'),
+                    'timestamp' => $appointment->created_at?->diffForHumans(),
+                ])->values()->all();
+
+            return [
+                'status' => 200,
+                'data' => [
+                    'overviewStats' => [
+                        ['id' => 1, 'titleKey' => 'Admin.Dashboard.stats.totalPatients', 'defaultTitle' => 'Total Patients', 'value' => number_format(Patient::count())],
+                        ['id' => 2, 'titleKey' => 'Admin.Dashboard.stats.totalDoctors', 'defaultTitle' => 'Total Doctors', 'value' => (string) Doctor::count()],
+                        ['id' => 3, 'titleKey' => 'Admin.Dashboard.stats.activeDepartments', 'defaultTitle' => 'Active Departments', 'value' => (string) Department::has('doctors')->count()],
+                        ['id' => 4, 'titleKey' => 'Admin.Dashboard.stats.todaysAppointments', 'defaultTitle' => "Today's Appointments", 'value' => (string) Apointment::today()->count()],
+                    ],
+                    'patientVisitsData' => $months,
+                    'appointmentData' => $appointmentData,
+                    'recentActivity' => $recentActivity,
+                    'topDoctors' => $topDoctors,
+                    'activeSecretaries' => User::where('role', 'secretary')
+                        ->latest()
+                        ->get(['id', 'first_name', 'last_name', 'email'])
+                        ->map(fn(User $user) => [
+                            'id' => 'sec_' . $user->id,
+                            'name' => trim($user->first_name . ' ' . $user->last_name),
+                            'email' => $user->email,
+                        ])->values()->all(),
+                ],
+            ];
+        } catch (Exception $e) {
+            return ['status' => 500, 'error' => $e->getMessage()];
+        }
+    }
 
     public function createSecretary()
     {

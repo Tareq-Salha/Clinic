@@ -49,6 +49,8 @@ return [
 
     // ######## Admin ######## //
 
+    'dashboard_statistics_returned_successfully' => 'تم جلب إحصائيات لوحة التحكم بنجاح.',
+
     // Secretary
     'secretary_created_successfully' => 'تم إنشاء السكرتير بنجاح.',
     'secretary_updated_successfully' => 'تم تحديث بيانات السكرتير بنجاح.',

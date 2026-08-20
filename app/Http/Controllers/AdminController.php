@@ -16,6 +16,17 @@ class AdminController extends Controller
     {
         $this->AdminService = $AdminService;
     }
+
+    public function dashboardStatistics()
+    {
+        $data = $this->AdminService->dashboardStatistics();
+
+        return match ($data['status']) {
+            200 => $this->response(__('messages.dashboard_statistics_returned_successfully'), $data['data'], 200),
+            500 => $this->response(__('messages.server_error', ['error' => $data['error'] ?? '']), null, 500),
+            default => $this->response(__('messages.unknown_error'), null, 520),
+        };
+    }
     public function createSecretary()
     {
         $data = $this->AdminService->createSecretary();

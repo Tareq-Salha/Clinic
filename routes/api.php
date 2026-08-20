@@ -41,6 +41,7 @@ Route::group([
 Route::group(
     ['middleware' => ['api', 'auth', AdminMiddleWare::class, SetLocale::class, TwoFactor::class]],
     function ($router) {
+        Route::get('admin/dashboard/statistics', [AdminController::class, 'dashboardStatistics']);
         Route::post('admin/secretary', [AdminController::class, 'createSecretary']);
         Route::put('admin/secretary', [AdminController::class, 'updateSecretary']);
         Route::delete('admin/secretary', [AdminController::class, 'deleteSecretary']);

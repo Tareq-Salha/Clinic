@@ -42,9 +42,9 @@ class UpdateProfileRequest extends FormRequest
             return [
                 'first_name' => 'required',
                 'last_name' => 'required',
-                'email' => 'required|email|unique:users,email,' . Auth::id(),
+                'email' => 'sometimes|email|unique:users,email,' . Auth::id(),
                 'phone' => 'required|unique:users,phone,' . Auth::id() . '|regex:/^\+963\d{9}$/',
-                'password' => 'required|confirmed|min:8',
+                'password' => 'sometimes|confirmed|min:8',
             ];
         }
     }

@@ -48,6 +48,8 @@ return [
 
     // ######## Admin ######## //
 
+    'dashboard_statistics_returned_successfully' => 'Dashboard statistics returned successfully.',
+
     // Secretary
     'secretary_created_successfully' => 'Secretary created successfully.',
     'secretary_updated_successfully' => 'Secretary updated successfully.',

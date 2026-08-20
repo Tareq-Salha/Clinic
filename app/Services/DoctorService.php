@@ -119,11 +119,11 @@ class DoctorService
         $user = User::find(auth()->user()->id);
         if ($user) {
             $user->update([
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'password' => $request->password
+                'first_name' => $request->first_name ?? $user->first_name,
+                'last_name' => $request->last_name ?? $user->last_name,
+                'email' => $request->email ?? $user->email,
+                'phone' => $request->phone ?? $user->phone,
+                'password' => $request->password ?? $user->password
             ]);
             $user->save();
             $message = __('messages.profile_updated_successfully');

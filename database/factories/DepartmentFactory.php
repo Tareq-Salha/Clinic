@@ -150,7 +150,7 @@ class DepartmentFactory extends Factory
         return [
             'name' => $data['name'],
             'description' => $data['description'],
-            'image' => $this->faker->imageUrl(640, 480, 'hospital medical', true, 'clinic room', true),
+            'image' => 'storage/departments_image/D' . self::$index . '.jpg',
         ];
     }
 }

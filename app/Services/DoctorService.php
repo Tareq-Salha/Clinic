@@ -57,10 +57,14 @@ class DoctorService
     }
     private function addMedicalAnalysisInfo($array, $medicalAnalysis)
     {
-        $medicalAnalysis = [
-            'medical_analysis_path' => $medicalAnalysis->medical_analysis_path,
-        ];
-        $array['medical_analysis_info'] = $medicalAnalysis;
+        $medicalAnalysiss = [];
+        foreach ($medicalAnalysis as $analysis) {
+            // $analysis->medical_analysis_path = url($analysis->medical_analysis_path);
+            $medicalAnalysiss[] = [
+                'medical_analysis_path' => $analysis,
+            ];
+        }
+        $array['medical_analysis_info'] = $medicalAnalysiss;
         return $array;
     }
     private function addPatientInfo($array, $patient)
@@ -455,7 +459,7 @@ class DoctorService
             $previedPatients = [];
             foreach ($previews as $preview) {
                 $patient = Patient::find($preview->patient_id);
-                $medicalAnalysis = MedicalAnalysis::where('preview_id', $preview->id)->where('patient_id', $patient->id)->first();
+                $medicalAnalysis = MedicalAnalysis::where('preview_id', $preview->id)->where('patient_id', $patient->id)->get();
                 if ($medicalAnalysis)
                     $this->addMedicalAnalysisInfo($patient, $medicalAnalysis);
                 $this->addPreviewInfo($patient, $preview);

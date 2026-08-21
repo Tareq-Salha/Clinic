@@ -80,7 +80,7 @@
 
 <body>
     <div class="container">
-        <img src="https://i.ibb.co/qL6QRbgW/Logo.png" alt="MediCore Logo" class="logo" />
+        <img src="https://i.ibb.co/gbQYFLvX/Logo.png" alt="MediCore Logo" class="logo" />
         <div class="hello-message">Hello! {{ $first_name }}</div>
         <h1>Welcome to MediCore application</h1>
         <p class="welcome">

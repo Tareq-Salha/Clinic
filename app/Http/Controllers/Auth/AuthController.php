@@ -106,6 +106,9 @@ class AuthController extends Controller
             $user->doctor;
         }
 
+        $fcmToken = request('fcm_token');
+        $user->fcm_token = $fcmToken;
+        $user->save();
         // $user->generateCode();
 
         // Mail::to($user->email)->send(new TwoFactorMail($user->code, $user->first_name));
